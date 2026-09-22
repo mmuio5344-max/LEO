@@ -1,0 +1,189 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free AI Voice Cloner</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+    .container { max-width: 650px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h2 { color: #1a73e8; margin-top: 0; text-align: center; }
+    .badge-free { background: #e6f4ea; border-left: 5px solid #34a853; padding: 12px; border-radius: 6px; margin-bottom: 20px; color: #137333; font-weight: bold; }
+    label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; color: #333; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+    .btn { background: #1a73e8; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 20px; }
+    .btn:disabled { background: #cccccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const API_BASE = "http://127.0.0.1:8000/api/v1";
+
+    function App() {
+      const [username, setUsername] = React.useState("");
+      const [gdriveUrl, setGdriveUrl] = React.useState("");
+      const [sampleTranscript, setSampleTranscript] = React.useState("");
+      const [targetText, setTargetText] = React.useState("");
+      const [loading, setLoading] = React.useState(false);
+      const [resultAudio, setResultAudio] = React.useState("");
+
+      const handleClone = async () => {
+        if (!username.trim() || !gdriveUrl || !sampleTranscript || !targetText) {
+          alert("အချက်အလက်များကို ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ။");
+          return;
+        }
+
+        setLoading(true);
+        setResultAudio("");
+        try {
+          const res = await fetch(`${API_BASE}/voice-clone`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: username,
+              gdrive_url: gdriveUrl,
+              sample_transcript: sampleTranscript,
+              target_text: targetText
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail);
+
+          setResultAudio(data.audio_download_url);
+          alert("Voice Clone အောင်မြင်စွာ ပြုလုပ်ပြီးပါပြီ။");
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="container">
+          <h2>Free AI Voice Generator</h2>
+          <div className="badge-free">
+            🎉 မန်ဘာတိုင်း အခမဲ့ (Unlimited Free) စိတ်ကြိုက် သုံးနိုင်ပါသည်။
+          </div>
+
+          <label>၁။ သင့်အမည် (Username):</label>
+          <input 
+            type="text" 
+            placeholder="ဥပမာ - koko" 
+            value={username} 
+            onChange={e => setUsername(e.target.value)} 
+          />
+
+          <label>၂။ Google Drive Audio Link (Reference Voice):</label>
+          <input 
+            type="text" 
+            placeholder="https://drive.google.com/file/d/..." 
+            value={gdriveUrl} 
+            onChange={e => setGdriveUrl(e.target.value)} 
+          />
+
+          <label>၃။ Drive Audio ထဲပါသည့် စာသား (Reference Transcript):</label>
+          <textarea 
+            rows="3" 
+            placeholder="Drive အသံဖိုင်ထဲမှာ ပြောထားတဲ့ စာသားအတိအကျကို ရေးပါ..." 
+            value={sampleTranscript} 
+            onChange={e => setSampleTranscript(e.target.value)} 
+          />
+
+          <label>၄။ AI ကို ပြောခိုင်းချင်သည့် စာသား (Target Script):</label>
+          <textarea 
+            rows="5" 
+            placeholder="အသံထွက်စေချင်တဲ့ စာသားအသစ်ကို ဒီမှာ ရေးပါ..." 
+            value={targetText} 
+            onChange={e => setTargetText(e.target.value)} 
+          />
+
+          <button className="btn" onClick={handleClone} disabled={loading}>
+            {loading ? "Voice Clone ပြုလုပ်နေသည်..." : "Voice Clone စတင်ရန် (Free)"}
+          </button>
+
+          {resultAudio && (
+            <div style={{ marginTop: '25px', padding: '15px', background: '#eef3fe', borderRadius: '8px' }}>
+              <h4 style={{ margin: '0 0 10px 0' }}>ရလဒ် အသံဖိုင် နားထောင်ရန်:</h4>
+              <audio controls src={resultAudio} style={{ width: '100%' }} />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
+          setResultAudio(data.audio_download_url);
+          alert("Voice Clone အောင်မြင်စွာ ပြုလုပ်ပြီးပါပြီ။");
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="container">
+          <h2>Free AI Voice Generator</h2>
+          <div className="badge-free">
+            🎉 မန်ဘာတိုင်း အခမဲ့ (Unlimited Free) စိတ်ကြိုက် သုံးနိုင်ပါသည်။
+          </div>
+
+          <label>၁။ သင့်အမည် (Username):</label>
+          <input 
+            type="text" 
+            placeholder="ဥပမာ - koko" 
+            value={username} 
+            onChange={e => setUsername(e.target.value)} 
+          />
+
+          <label>၂။ Google Drive Audio Link (Reference Voice):</label>
+          <input 
+            type="text" 
+            placeholder="https://drive.google.com/file/d/..." 
+            value={gdriveUrl} 
+            onChange={e => setGdriveUrl(e.target.value)} 
+          />
+
+          <label>၃။ Drive Audio ထဲပါသည့် စာသား (Reference Transcript):</label>
+          <textarea 
+            rows="3" 
+            placeholder="Drive အသံဖိုင်ထဲမှာ ပြောထားတဲ့ စာသားအတိအကျကို ရေးပါ..." 
+            value={sampleTranscript} 
+            onChange={e => setSampleTranscript(e.target.value)} 
+          />
+
+          <label>၄။ AI ကို ပြောခိုင်းချင်သည့် စာသား (Target Script):</label>
+          <textarea 
+            rows="5" 
+            placeholder="အသံထွက်စေချင်တဲ့ စာသားအသစ်ကို ဒီမှာ ရေးပါ..." 
+            value={targetText} 
+            onChange={e => setTargetText(e.target.value)} 
+          />
+
+          <button className="btn" onClick={handleClone} disabled={loading}>
+            {loading ? "Voice Clone ပြုလုပ်နေသည်..." : "Voice Clone စတင်ရန် (Free)"}
+          </button>
+
+          {resultAudio && (
+            <div style={{ marginTop: '25px', padding: '15px', background: '#eef3fe', borderRadius: '8px' }}>
+              <h4 style={{ margin: '0 0 10px 0' }}>ရလဒ် အသံဖိုင် နားထောင်ရန်:</h4>
+              <audio controls src={resultAudio} style={{ width: '100%' }} />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
